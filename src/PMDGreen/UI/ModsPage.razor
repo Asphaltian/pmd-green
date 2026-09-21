@@ -1,0 +1,280 @@
+@using LibRecomp
+@using LibRecomp.Mods
+@using Socotra
+@using static SDL.SDL3
+@inherits Panel
+
+<root class="form">
+    @if (Configuring is { } configured)
+    {
+        <div class="header">
+            <button class="action" onclick=@(() => _configuringId = null) autofocus>Back</button>
+            <label class="heading">@configured.Manifest.DisplayName</label>
+        </div>
+        <div class="body">
+            <div class="options" onmouseout=@LeaveOptions>
+                @foreach (var option in configured.Config.Options)
+                {
+                    switch (option.Type)
+                    {
+                        case ConfigOptionType.Enum:
+                            <ConfigOption Title=@option.Name Description=@option.Description Choices=@option.Options
+                                          Selected=@((int)configured.Config.GetEnum(option.Id))
+                                          Chosen=@((int choice) => Set(() => configured.Config.SetEnum(option.Id, (uint)choice))) Describe=@Describe />
+                            break;
+                        case ConfigOptionType.Number:
+                            <ConfigRange Title=@option.Name Description=@option.Description Min=@option.Min Max=@option.Max Step=@option.Step
+                                         Precision=@option.Precision Unit=@(option.Percent ? "%" : "") Value=@configured.Config.GetNumber(option.Id)
+                                         Changed=@((double value) => Set(() => configured.Config.SetNumber(option.Id, value))) Describe=@Describe />
+                            break;
+                        case ConfigOptionType.String:
+                            <div class="text-option" onmouseover=@(() => Describe(option.Description))>
+                                <label class="title">@option.Name</label>
+                                <TextEntry class="field" Value=@configured.Config.GetString(option.Id)
+                                           OnTextEdited=@((string text) => Set(() => configured.Config.SetString(option.Id, text)))
+                                           onfocus=@(() => Describe(option.Description)) onblur=@(() => Describe("")) />
+                            </div>
+                            break;
+                    }
+                }
+            </div>
+            <div class="description">
+                <label>@_description</label>
+            </div>
+        </div>
+    }
+    else if (ModManager.Mods.Count == 0)
+    {
+        <div class="empty">
+            <label class="heading">No mods yet!</label>
+            <label>Install some, or put them in your mods folder, and they'll show up here.</label>
+        </div>
+    }
+    else
+    {
+        <div class="browser">
+            <div class="list" @ref="_list">
+                @for (int i = 0; i < ModManager.Mods.Count; i++)
+                {
+                    var mod = ModManager.Mods[i];
+                    int index = i;
+                    <div class="spacer @(_drag?.Target == index ? "open" : "")"></div>
+                    <ModEntry class="entry @(IsOn(mod) ? "" : "off") @(_drag?.Mod == mod ? "dragged" : "")" Active=@(mod == Selected) Reorderable=@(!Started)
+                              onclick=@(() => _selectedId = mod.Manifest.Id) onfocus=@(() => _selectedId = mod.Manifest.Id)
+                              ondragstart=@((PanelEvent e) => StartDrag(mod, index, e)) ondrag=@MoveDrag ondragend=@(() => EndDrag(mod))>
+                        <ChildContent>
+                            <Image class="thumbnail" Texture=@Thumbnail(mod) />
+                            <div class="text">
+                                <label class="name">@mod.Manifest.DisplayName</label>
+                                <label class="summary">@mod.Manifest.ShortDescription</label>
+                            </div>
+                        </ChildContent>
+                    </ModEntry>
+                }
+                <div class="spacer @(_drag?.Target == ModManager.Mods.Count ? "open" : "")"></div>
+            </div>
+            <div class="details">
+                <div class="top">
+                    <Image class="thumbnail small" Texture=@Thumbnail(Selected) />
+                    <div class="titles">
+                        <label class="heading">@Selected.Manifest.DisplayName</label>
+                        <label class="version">Version @Selected.Manifest.Version</label>
+                    </div>
+                </div>
+                <div class="about">
+                    <label class="authors">By @Authors(Selected)</label>
+                    <label>@Selected.Manifest.Description</label>
+                </div>
+                <div class="controls">
+                    <div class="enable">
+                        <button class="toggle" disabled=@(Started || ModManager.IsAutoEnabled(Selected.Manifest.Id)) onclick=@(() => Toggle(Selected))>
+                            <SwitchControl Value=@IsOn(Selected) Label=@(IsOn(Selected) ? "On" : "Off") />
+                        </button>
+                        @if (ModManager.IsAutoEnabled(Selected.Manifest.Id))
+                        {
+                            <label class="note">Another mod needs this one, so it stays on.</label>
+                        }
+                    </div>
+                    <button class="action" disabled=@(Selected.Config.Options.Count == 0) onclick=@(() => _configuringId = Selected.Manifest.Id)>Options</button>
+                </div>
+            </div>
+            @if (_drag is { } drag)
+            {
+                <div class="entry floating @(IsOn(drag.Mod) ? "" : "off")" style=@($"left: {drag.Left}px; top: {drag.Top}px; width: {drag.Width}px;")>
+                    <Image class="thumbnail" Texture=@Thumbnail(drag.Mod) />
+                    <div class="text">
+                        <label class="name">@drag.Mod.Manifest.DisplayName</label>
+                        <label class="summary">@drag.Mod.Manifest.ShortDescription</label>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    @if (Configuring is null)
+    {
+        <div class="footer">
+            <button class="action" disabled=@Started onclick=@(() => InstallFromFile?.Invoke())>Install Mods</button>
+            <div class="gap"></div>
+            <button class="action" disabled=@Started onclick=@Refresh>Refresh</button>
+            <button class="action" onclick=@OpenModsFolder>Open Mods Folder</button>
+        </div>
+    }
+</root>
+
+@code {
+    private readonly Dictionary<Mod, Texture?> _thumbnails = [];
+    private string? _selectedId;
+    private string? _configuringId;
+    private string _description = "";
+    private int _revision;
+    private Panel? _list;
+    private DragState? _drag;
+
+    [Parameter] public Action? InstallFromFile { get; set; }
+
+    private static bool Started => Recomp.CurrentGame is not null;
+
+    private Mod Selected => ModManager.Mods.FirstOrDefault(mod => mod.Manifest.Id == _selectedId) ?? ModManager.Mods[0];
+
+    private Mod? Configuring => ModManager.Mods.FirstOrDefault(mod => mod.Manifest.Id == _configuringId);
+
+    protected override int BuildHash()
+    {
+        var hash = new HashCode();
+        hash.Add(_selectedId);
+        hash.Add(_configuringId);
+        hash.Add(_description);
+        hash.Add(_revision);
+        hash.Add(_drag);
+        foreach (var mod in ModManager.Mods)
+        {
+            hash.Add(mod);
+        }
+
+        return hash.ToHashCode();
+    }
+
+    protected override void OnEscape(PanelEvent e)
+    {
+        if (_configuringId is not null)
+        {
+            _configuringId = null;
+            e.StopPropagation();
+        }
+    }
+
+    private static bool IsOn(Mod mod) => ModManager.IsEnabled(mod.Manifest.Id) || ModManager.IsAutoEnabled(mod.Manifest.Id);
+
+    private static string Authors(Mod mod) => mod.Manifest.Authors switch
+    {
+        [] => "Unknown",
+        [var only] => only,
+        var authors => $"{string.Join(", ", authors.Take(authors.Count - 1))} and {authors[^1]}",
+    };
+
+    private Texture? Thumbnail(Mod mod)
+    {
+        if (!_thumbnails.TryGetValue(mod, out var texture))
+        {
+            try
+            {
+                texture = mod.Thumbnail is { } png ? Texture.FromImage(png) : null;
+            }
+            catch (InvalidDataException)
+            {
+                texture = null;
+            }
+
+            _thumbnails[mod] = texture;
+        }
+
+        return texture;
+    }
+
+    private void Toggle(Mod mod)
+    {
+        ModManager.Enable(mod.Manifest.Id, !ModManager.IsEnabled(mod.Manifest.Id));
+        _revision++;
+    }
+
+    private void Describe(string description) => _description = description;
+
+    private void LeaveOptions(PanelEvent e)
+    {
+        if (e.This is { HasHovered: false })
+        {
+            Describe("");
+        }
+    }
+
+    private void Set(Action change)
+    {
+        change();
+        _revision++;
+    }
+
+    private void Refresh()
+    {
+        ModManager.Refresh();
+        _thumbnails.Clear();
+        _revision++;
+    }
+
+    private static void OpenModsFolder()
+    {
+        SDL_OpenURL(new Uri(ModManager.Folder).AbsoluteUri);
+    }
+
+    private void StartDrag(Mod mod, int index, PanelEvent e)
+    {
+        if (e is not DragEvent drag || e.This is not { } entry || _list?.Parent is not { } browser)
+        {
+            return;
+        }
+
+        var middles = _list.Children.Where(child => child.HasClass("entry")).Select(child => child.Box.Rect.Top + (child.Box.Rect.Height / 2)).ToArray();
+        float scale = ScaleFromScreen;
+        var entryRect = entry.Box.Rect;
+        var browserRect = browser.Box.Rect;
+        var listRect = _list.Box.Rect;
+        _selectedId = mod.Manifest.Id;
+        _drag = new DragState(mod, index, middles, drag.ScreenGrabPosition.Y,
+            Left: (entryRect.Left - browserRect.Left) * scale,
+            StartTop: (entryRect.Top - browserRect.Top) * scale,
+            MinTop: (listRect.Top - browserRect.Top) * scale,
+            MaxTop: (listRect.Bottom - entryRect.Height - browserRect.Top) * scale,
+            Width: entryRect.Width * scale,
+            Offset: 0);
+    }
+
+    private void MoveDrag(PanelEvent e)
+    {
+        if (e is not DragEvent drag || _drag is not { } state)
+        {
+            return;
+        }
+
+        int target = state.Middles.Count(middle => middle <= drag.ScreenPosition.Y);
+        _drag = state with { Target = target, Offset = (drag.ScreenPosition.Y - state.GrabY) * ScaleFromScreen };
+    }
+
+    private void EndDrag(Mod mod)
+    {
+        if (_drag is not { } state)
+        {
+            return;
+        }
+
+        _drag = null;
+        int target = state.Target > state.From ? state.Target - 1 : state.Target;
+        ModManager.SetIndex(mod.Manifest.Id, target);
+        _selectedId = mod.Manifest.Id;
+    }
+
+    private sealed record DragState(Mod Mod, int From, float[] Middles, float GrabY, float Left, float StartTop, float MinTop, float MaxTop, float Width, float Offset)
+    {
+        public int Target { get; init; } = From;
+
+        public float Top => Math.Clamp(StartTop + Offset, MinTop, Math.Max(MinTop, MaxTop));
+    }
+}

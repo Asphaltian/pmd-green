@@ -1,0 +1,198 @@
+@import "theme";
+
+ControlsPage {
+    .device {
+        position: relative;
+        width: 162px;
+        height: 72px;
+        flex-shrink: 0;
+        border: 4px solid $color-border;
+        border-radius: $radius-round;
+        background-color: $color-border;
+        transition: background-color 0.15s $ease, border-color 0.15s $ease;
+
+        &:hover,
+        &:focus {
+            border-color: $color-border-hard;
+            background-color: $color-border-hard;
+        }
+
+        .floater {
+            position: absolute;
+            left: 0%;
+            top: 0;
+            bottom: 0;
+            width: 50%;
+            border-radius: $radius-round;
+            background-color: $color-primary;
+            transition: left 0.15s $ease;
+        }
+
+        .icons {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            flex-direction: row;
+        }
+
+        i {
+            flex-grow: 1;
+            flex-basis: 0;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 40px;
+            line-height: 40px;
+            color: $color-text-inactive;
+            transition: color 0.15s $ease;
+        }
+
+        .gamepad {
+            color: $color-background;
+        }
+
+        &.keyboard {
+            .floater {
+                left: 50%;
+            }
+
+            .gamepad {
+                color: $color-text-inactive;
+            }
+
+            .keys {
+                color: $color-background;
+            }
+        }
+    }
+
+    .split {
+        flex-direction: row;
+        flex-grow: 1;
+        min-height: 0;
+        background-color: $color-shadow;
+        border-bottom-left-radius: 16px;
+        border-bottom-right-radius: 16px;
+    }
+
+    .mappings {
+        flex-direction: column;
+        flex-grow: 0;
+        flex-shrink: 1;
+        flex-basis: 760px;
+        min-height: 0;
+        padding: 8px 16px;
+        overflow-y: scroll;
+
+        .mapping {
+            flex-direction: row;
+            align-items: center;
+            flex-shrink: 0;
+            width: 100%;
+            padding: 4px 16px 4px 20px;
+            border-radius: 12px;
+            color: $color-text-dim;
+            transition: color 0.15s $ease, background-color 0.15s $ease;
+
+            &:hover,
+            &:focus {
+                color: $color-text;
+                background-color: $color-overlay;
+            }
+        }
+
+        .name {
+            @include title;
+            flex-grow: 1;
+            flex-shrink: 1;
+            flex-basis: 200px;
+            white-space: nowrap;
+        }
+
+        .bindings {
+            flex-direction: row;
+            align-items: center;
+            flex-grow: 2;
+            flex-shrink: 1;
+            flex-basis: 400px;
+            height: 64px;
+            padding: 0 12px 0 4px;
+        }
+
+        .binding {
+            flex-grow: 1;
+            flex-shrink: 1;
+            flex-basis: 0;
+            height: 64px;
+            margin: 0 4px;
+            align-items: center;
+            justify-content: center;
+            border: $border-width solid $color-overlay;
+            border-radius: 12px;
+            background-color: $color-overlay;
+            color: $color-text-dim;
+            transition: color 0.15s $ease, background-color 0.15s $ease, border-color 0.15s $ease;
+
+            &:hover,
+            &:focus {
+                border-color: $color-text;
+                background-color: $color-border-soft;
+                color: $color-text;
+            }
+
+            &.listening {
+                border-color: $color-primary;
+                color: $color-primary;
+            }
+        }
+
+        .glyph {
+            width: 48px;
+            height: 48px;
+        }
+
+        .key,
+        .hint {
+            @include choice;
+        }
+
+        .hint {
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        .clear {
+            width: 56px;
+            height: 56px;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            border-radius: $radius-round;
+            color: $color-text-dim;
+            font-size: 32px;
+            line-height: 32px;
+            transition: color 0.15s $ease, background-color 0.15s $ease;
+
+            &:hover,
+            &:focus {
+                color: $color-text;
+                background-color: rgba(248, 96, 57, 0.3);
+            }
+        }
+    }
+}
+
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}

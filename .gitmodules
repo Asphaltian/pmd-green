@@ -1,0 +1,6 @@
+[submodule "lib/GBAModernRuntime"]
+	path = lib/GBAModernRuntime
+	url = https://github.com/Asphaltian/GBAModernRuntime
+[submodule "lib/Socotra"]
+	path = lib/Socotra
+	url = https://github.com/Asphaltian/Socotra

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Green Rescue Team
+Exec=pmd_green
+Icon=pmd_green
+Terminal=false
+Categories=Game;

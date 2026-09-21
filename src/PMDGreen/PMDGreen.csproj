@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>pmd_green</AssemblyName>
+    <AssemblyTitle>Green Rescue Team</AssemblyTitle>
+    <Product>Green Rescue Team</Product>
+    <Version>0.1.0</Version>
+    <ApplicationIcon>..\..\icons\pmd_green.ico</ApplicationIcon>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <PublishSingleFile>true</PublishSingleFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.AspNetCore.Components" />
+    <Using Include="Microsoft.AspNetCore.Components.Rendering" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ppy.SDL3-CS" Version="2026.722.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\RecompiledFuncs\RecompiledFuncs.csproj" />
+    <ProjectReference Include="..\..\lib\GBAModernRuntime\src\AGBModern\AGBModern.csproj" />
+    <ProjectReference Include="..\..\lib\GBAModernRuntime\src\GBARenderer\GBARenderer.csproj" />
+    <ProjectReference Include="..\..\lib\GBAModernRuntime\src\LibRecomp\LibRecomp.csproj" />
+    <ProjectReference Include="..\..\lib\Socotra\src\Socotra\Socotra.csproj" />
+    <ProjectReference Include="..\..\lib\Socotra\src\Socotra.Vulkan\Socotra.Vulkan.csproj" />
+    <ProjectReference Include="..\..\lib\Socotra\src\Socotra.Generator\Socotra.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\assets\**" Link="assets\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="UI\**\*.scss" CopyToOutputDirectory="PreserveNewest" />
+    <AdditionalFiles Include="UI\**\*.razor" />
+    <Content Include="..\..\THIRD-PARTY-NOTICES.txt" Link="THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Include="..\..\icons\pmd_green.png" LogicalName="pmd_green.png" />
+  </ItemGroup>
+
+  <Target Name="PublishModReferences" AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <ResolvedFileToPublish Condition="'%(ResolvedFileToPublish.Filename)' == 'pmd_green' or '%(ResolvedFileToPublish.Filename)' == 'RecompiledFuncs' or '%(ResolvedFileToPublish.Filename)' == 'LibRecomp' or '%(ResolvedFileToPublish.Filename)' == 'AGBModern' or '%(ResolvedFileToPublish.Filename)' == 'GBARenderer'">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="LeaveOutSymbolsAndDocs" AfterTargets="PublishModReferences">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)" Condition="'%(ResolvedFileToPublish.Extension)' == '.pdb' or ('%(ResolvedFileToPublish.Extension)' == '.xml' and '%(ResolvedFileToPublish.ExcludeFromSingleFile)' != 'true')" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="PublishRuntimeLicenses" AfterTargets="Publish" Condition="'$(SelfContained)' == 'true'">
+    <ItemGroup>
+      <RuntimePackLicense Include="@(ResolvedRuntimePack->WithMetadataValue('FrameworkName', 'Microsoft.NETCore.App')->'%(PackageDirectory)\LICENSE.TXT')" />
+      <RuntimePackLicense Include="@(ResolvedRuntimePack->WithMetadataValue('FrameworkName', 'Microsoft.NETCore.App')->'%(PackageDirectory)\THIRD-PARTY-NOTICES.TXT')" />
+    </ItemGroup>
+    <Copy SourceFiles="@(RuntimePackLicense)" DestinationFolder="$(PublishDir)licenses\dotnet" />
+  </Target>
+
+</Project>

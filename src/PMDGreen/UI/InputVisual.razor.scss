@@ -1,0 +1,187 @@
+@import "theme";
+
+@mixin box($left, $top, $width, $height) {
+    left: $left;
+    top: $top;
+    width: $width;
+    height: $height;
+}
+
+InputVisual {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+
+    .diagram {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1.5;
+    }
+
+    .outline,
+    .callout,
+    .lines,
+    .caption {
+        position: absolute;
+    }
+
+    .outline {
+        background-image: url("../assets/ui/gba.png");
+        background-size: 100% 100%;
+        opacity: 0.7;
+    }
+
+    .callout {
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    .lines {
+        opacity: 0.6;
+        transition: opacity 0.15s $ease;
+    }
+
+    .callout.focused .lines {
+        opacity: 1;
+    }
+
+    .caption {
+        flex-direction: column;
+        width: 20%;
+        margin-top: -16px;
+    }
+
+    .row {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        height: 32px;
+        padding: 0 10px;
+        border: $border-width solid $color-border-solid;
+        background-color: $color-modal;
+        transition: background-color 0.15s $ease, border-color 0.15s $ease;
+
+        & + .row {
+            margin-top: -2px;
+        }
+
+        &.focused {
+            border-color: $color-primary;
+            background-color: rgba(111, 227, 154, 0.25);
+        }
+    }
+
+    .left .row {
+        flex-direction: row-reverse;
+    }
+
+    .glyphs {
+        flex-direction: row;
+        flex-shrink: 0;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .glyph {
+        width: 24px;
+        height: 24px;
+    }
+
+    .name {
+        font-size: 18px;
+        line-height: 24px;
+        white-space: nowrap;
+    }
+
+    .left .name {
+        flex-grow: 1;
+        text-align: right;
+    }
+
+    .outline {
+        @include box(24.000%, 27.650%, 52.000%, 44.699%);
+    }
+
+    .l {
+        .lines {
+            @include box(21.233%, 11.600%, 8.311%, 19.933%);
+        }
+
+        .caption {
+            left: 1.500%;
+            top: 12.000%;
+        }
+    }
+
+    .dpad {
+        .lines {
+            @include box(21.233%, 32.600%, 7.115%, 14.766%);
+        }
+
+        .caption {
+            left: 1.500%;
+            top: 33.000%;
+        }
+    }
+
+    .start {
+        .lines {
+            @include box(21.233%, 58.123%, 13.025%, 10.277%);
+        }
+
+        .caption {
+            left: 1.500%;
+            top: 68.000%;
+        }
+    }
+
+    .select {
+        .lines {
+            @include box(21.233%, 62.503%, 13.025%, 16.897%);
+        }
+
+        .caption {
+            left: 1.500%;
+            top: 79.000%;
+        }
+    }
+
+    .r {
+        .lines {
+            @include box(70.456%, 11.600%, 8.311%, 19.933%);
+        }
+
+        .caption {
+            left: 78.500%;
+            top: 12.000%;
+        }
+    }
+
+    .a {
+        .lines {
+            @include box(72.321%, 39.600%, 6.446%, 6.657%);
+        }
+
+        .caption {
+            left: 78.500%;
+            top: 40.000%;
+        }
+    }
+
+    .b {
+        .lines {
+            @include box(67.712%, 48.676%, 11.055%, 3.724%);
+        }
+
+        .caption {
+            left: 78.500%;
+            top: 52.000%;
+        }
+    }
+}

@@ -1,0 +1,137 @@
+@import "theme";
+
+Launcher {
+    @include body;
+    width: 100%;
+    height: 100%;
+    background-color: $color-background;
+    color: $color-text;
+    overflow: hidden;
+
+    > .art {
+        position: absolute;
+        left: min(0px, calc(68% - 128.1vh));
+        top: -23.2vh;
+        width: 251.2vh;
+        height: 137vh;
+        background-image: url("../assets/ui/cover_art.png");
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        transition: opacity 1.2s $ease;
+
+        &:intro {
+            opacity: 0;
+        }
+    }
+
+    > .shade {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-image: linear-gradient(to right, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.82) 12%, rgba(0, 0, 0, 0.68) 22%, rgba(0, 0, 0, 0.48) 32%, rgba(0, 0, 0, 0.28) 42%, rgba(0, 0, 0, 0.12) 52%, rgba(0, 0, 0, 0.03) 61%, rgba(0, 0, 0, 0) 70%);
+    }
+
+    > .corner {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(ellipse at 0% 100%, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.35) 30%, rgba(0, 0, 0, 0) 62%);
+    }
+
+    > .glow {
+        position: absolute;
+        left: calc(min(128.1vh, 68%) - 680px);
+        top: calc(50vh - 440px);
+        width: 1360px;
+        height: 880px;
+        background-image: radial-gradient(ellipse closest-side at 50% 50%, rgba(255, 246, 214, 0.8) 0%, rgba(255, 242, 204, 0.66) 40%, rgba(255, 236, 190, 0.42) 62%, rgba(255, 230, 180, 0.18) 80%, rgba(255, 226, 172, 0.05) 92%, rgba(255, 226, 172, 0) 100%);
+        mix-blend-mode: lighten;
+        transition: opacity 1.2s $ease;
+
+        &:intro {
+            opacity: 0;
+        }
+    }
+
+    > .logo {
+        position: absolute;
+        left: calc(min(128.1vh, 68%) - 360px);
+        top: calc(50vh - 220px);
+        width: 720px;
+        height: 439px;
+        background-image: url("../assets/ui/logo.png");
+        background-size: contain;
+        background-repeat: no-repeat;
+        filter: drop-shadow(0px 12px 32px rgba(0, 0, 0, 0.45));
+        transition: transform 0.9s $ease 0.2s, opacity 0.9s $ease 0.2s;
+
+        &:intro {
+            opacity: 0;
+            transform: translateY(24px);
+        }
+    }
+
+    > .menu {
+        position: absolute;
+        left: 112px;
+        bottom: 72px;
+        flex-direction: column;
+        align-items: flex-start;
+        transition: transform 0.7s $ease 0.15s, opacity 0.7s $ease 0.15s;
+
+        &:intro {
+            opacity: 0;
+            transform: translateX(-32px);
+        }
+
+        .item {
+            align-items: center;
+            padding: 12px 0 12px 32px;
+            color: $color-text-dim;
+            pointer-events: all;
+            transition: color 0.18s $ease;
+
+            label {
+                font-size: 40px;
+                font-weight: 700;
+                line-height: 48px;
+                transition: transform 0.2s $ease;
+            }
+
+            &:hover,
+            &:focus-visible {
+                color: $color-text;
+
+                .marker {
+                    height: 34px;
+                }
+
+                label {
+                    transform: translateX(12px);
+                }
+            }
+
+            &:active {
+                color: $color-primary;
+            }
+        }
+
+        .marker {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 4px;
+            height: 0;
+            border-radius: 2px;
+            background-color: $color-primary;
+            transform: translateY(-50%);
+            transition: height 0.2s $ease;
+        }
+
+        .version {
+            margin-top: 40px;
+            font-size: 18px;
+            color: $color-text-dim;
+        }
+    }
+}

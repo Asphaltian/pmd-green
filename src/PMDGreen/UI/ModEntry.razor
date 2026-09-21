@@ -1,0 +1,12 @@
+@using Socotra
+@inherits Button
+
+<root>
+    @ChildContent
+</root>
+
+@code {
+    [Parameter] public bool Reorderable { get; set; }
+
+    public override bool WantsDrag => Reorderable;
+}

@@ -1,0 +1,283 @@
+@import "theme";
+
+ConfigMenu {
+    @include body;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    padding: 64px;
+    background-color: rgba(0, 0, 0, 0.55);
+    color: $color-text;
+    pointer-events: all;
+    transition: background-color 0.25s $ease;
+
+    &:intro {
+        background-color: rgba(0, 0, 0, 0);
+    }
+
+    > .modal {
+        position: relative;
+        flex-direction: column;
+        flex-grow: 1;
+        flex-shrink: 1;
+        width: 100%;
+        max-width: 1692px;
+        min-height: 0;
+        margin: 0 auto;
+        border: $border-width solid $color-border;
+        border-radius: 16px;
+        background-color: $color-modal;
+        backdrop-filter: blur(24px);
+        transition: transform 0.2s $ease;
+
+        &:intro {
+            transform: scale(0.96);
+        }
+
+        > .tabs {
+            position: relative;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            > .tab {
+                padding: 20px 24px;
+                color: $color-text-inactive;
+                transition: color 0.15s $ease;
+
+                label {
+                    @include heading;
+                }
+
+                .indicator {
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    bottom: 2px;
+                    height: 3px;
+                    border-radius: $radius-round;
+                }
+
+                &:hover,
+                &:focus {
+                    color: $color-text;
+                }
+
+                &:focus-visible {
+                    animation: focus-pulse 0.75s infinite;
+                }
+
+                &.active {
+                    color: $color-text;
+
+                    .indicator {
+                        background-color: $color-border-solid;
+                    }
+
+                    &:focus-visible .indicator {
+                        animation: focus-pulse-background 0.75s infinite;
+                    }
+                }
+            }
+
+            > .icons {
+                position: absolute;
+                top: 50%;
+                right: 14px;
+                flex-direction: row;
+                gap: 8px;
+                transform: translateY(-50%);
+
+                > .icon {
+                    width: 56px;
+                    height: 56px;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: $radius-round;
+                    color: $color-text-dim;
+                    font-size: 32px;
+                    line-height: 32px;
+                    transition: color 0.15s $ease, background-color 0.15s $ease;
+
+                    &:hover,
+                    &:focus {
+                        color: $color-text;
+                        background-color: $color-border;
+                    }
+                }
+            }
+        }
+    }
+
+    > .prompts {
+        position: absolute;
+        left: 0;
+        bottom: 12px;
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 40px;
+
+        .prompt {
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+        }
+
+        .glyph {
+            width: 40px;
+            height: 40px;
+        }
+
+        .arrows {
+            flex-direction: column;
+            align-items: center;
+
+            .row {
+                flex-direction: row;
+            }
+
+            .key {
+                width: 22px;
+                height: 22px;
+            }
+        }
+    }
+
+    .form {
+        flex-direction: column;
+        flex-grow: 1;
+        min-height: 0;
+        border-top: $border-width solid $color-border-soft;
+    }
+
+    .header,
+    .footer {
+        flex-direction: row;
+        align-items: center;
+        flex-shrink: 0;
+        background-color: $color-shadow;
+    }
+
+    .header {
+        justify-content: space-between;
+        gap: 16px;
+        padding: 12px 20px;
+        border-bottom: $border-width solid $color-border-soft;
+    }
+
+    .footer {
+        justify-content: flex-end;
+        gap: 20px;
+        padding: 20px;
+        border-top: $border-width solid $color-border-soft;
+        border-bottom-left-radius: 16px;
+        border-bottom-right-radius: 16px;
+    }
+
+    .body {
+        flex-direction: row;
+        flex-grow: 1;
+        min-height: 0;
+    }
+
+    .options,
+    .description {
+        flex-grow: 1;
+        flex-shrink: 1;
+        flex-basis: 0;
+        flex-direction: column;
+        padding: 16px;
+        background-color: $color-shadow;
+    }
+
+    .options {
+        overflow-y: scroll;
+        border-bottom-left-radius: 16px;
+    }
+
+    .description {
+        border-bottom-right-radius: 16px;
+
+        > label {
+            padding: 16px;
+        }
+    }
+
+    .action {
+        @include title;
+        padding: 16px 28px;
+        border: $border-width solid rgba(111, 227, 154, 0.8);
+        border-radius: $radius-round;
+        background-color: rgba(111, 227, 154, 0.05);
+        color: $color-text-dim;
+        transition: color 0.15s $ease, background-color 0.15s $ease, border-color 0.15s $ease;
+
+        &:hover,
+        &:focus {
+            border-color: $color-primary;
+            background-color: rgba(111, 227, 154, 0.3);
+            color: $color-text;
+        }
+
+        &:active {
+            background-color: rgba(111, 227, 154, 0.2);
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        &.danger {
+            border-color: rgba(248, 96, 57, 0.8);
+            background-color: rgba(248, 96, 57, 0.05);
+
+            &:hover,
+            &:focus {
+                border-color: $color-error;
+                background-color: rgba(248, 96, 57, 0.3);
+            }
+
+            &:active {
+                background-color: rgba(248, 96, 57, 0.2);
+            }
+        }
+
+        &.plain {
+            border-color: rgba(238, 243, 239, 0.8);
+            background-color: rgba(238, 243, 239, 0.05);
+
+            &:hover,
+            &:focus {
+                border-color: $color-text;
+                background-color: rgba(238, 243, 239, 0.3);
+            }
+
+            &:active {
+                background-color: rgba(238, 243, 239, 0.2);
+            }
+        }
+
+        &.warning {
+            border-color: rgba(233, 205, 53, 0.8);
+            background-color: rgba(233, 205, 53, 0.05);
+
+            &:hover,
+            &:focus {
+                border-color: $color-warning;
+                background-color: rgba(233, 205, 53, 0.3);
+            }
+
+            &:active {
+                background-color: rgba(233, 205, 53, 0.2);
+            }
+        }
+    }
+}

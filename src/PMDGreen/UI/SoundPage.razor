@@ -1,0 +1,22 @@
+@using Socotra
+@inherits SettingsPage
+
+<root class="form">
+    <div class="body">
+        <div class="options" onmouseout=@LeaveOptions>
+            <ConfigRange Title="Volume"
+                         Description="Change how loud the game is overall."
+                         Unit="%" Value=@Settings.Volume Changed=@((double volume) => Set(() => Settings.Volume = (int)volume)) Describe=@Describe />
+            <ConfigRange Title="Music Volume"
+                         Description="Change how loud the music is, without changing the sound effects."
+                         Unit="%" Value=@Settings.MusicVolume Changed=@((double volume) => Set(() => Settings.MusicVolume = (int)volume)) Describe=@Describe />
+        </div>
+        <div class="description">
+            <label>@Description</label>
+        </div>
+    </div>
+</root>
+
+@code {
+    protected override int BuildHash() => HashCode.Combine(Description, Settings.Volume, Settings.MusicVolume);
+}

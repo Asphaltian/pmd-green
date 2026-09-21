@@ -1,0 +1,88 @@
+name: validate
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  SLANG_VERSION: '2026.8'
+  SYMBOLS_URL: https://raw.githubusercontent.com/pret/pmd-red/66d44bd59/pmd_red.sym
+jobs:
+  build:
+    if: github.event_name == 'push' || github.repository == github.event.pull_request.head.repo.full_name
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux-x86_64
+            rid: linux-x64
+          - os: windows-latest
+            platform: windows-x86_64
+            rid: win-x64
+          - os: macos-latest
+            platform: macos-aarch64
+            rid: osx-arm64
+    name: ${{ matrix.rid }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Install Slang
+        shell: bash
+        run: |
+          curl -fsSL "https://github.com/shader-slang/slang/releases/download/v${{ env.SLANG_VERSION }}/slang-${{ env.SLANG_VERSION }}-${{ matrix.platform }}.zip" -o slang.zip
+          unzip -q slang.zip -d "$RUNNER_TEMP/slang"
+          echo "$RUNNER_TEMP/slang/bin" >> "$GITHUB_PATH"
+      - name: Get the ROM and the symbols
+        shell: bash
+        run: |
+          git clone ${{ secrets.ROM_REPO_WITH_PAT }} "$RUNNER_TEMP/rom"
+          cp "$RUNNER_TEMP/rom/pmd_red.gba" .
+          curl -fsSL -o pmd_red.sym "${{ env.SYMBOLS_URL }}"
+      - name: Recompile
+        run: dotnet run --project lib/GBAModernRuntime/GBARecomp/src/GBARecomp -c Release -- us.toml
+      - name: Publish
+        run: dotnet publish src/PMDGreen -c Release -r ${{ matrix.rid }} --self-contained -o publish
+      - name: Build the AppImage
+        if: runner.os == 'Linux'
+        run: sh .github/linux/appimage.sh publish
+      - name: Build the app bundle
+        if: runner.os == 'macOS'
+        run: sh .github/macos/bundle.sh publish
+      - name: Keep file permissions
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          tar -czf pmd_green.tar.gz -C publish .
+          rm -r publish
+          mkdir publish
+          mv pmd_green.tar.gz publish
+      - name: Upload
+        if: runner.os != 'macOS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pmd_green-${{ matrix.rid }}
+          path: publish
+      - name: Upload the AppImage
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pmd_green-${{ matrix.rid }}-AppImage
+          path: pmd_green-*.AppImage
+      - name: Upload the app bundle
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pmd_green-${{ matrix.rid }}
+          path: pmd_green.zip

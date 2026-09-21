@@ -1,0 +1,52 @@
+@using Socotra
+@using System.Globalization
+@inherits Panel
+
+<root tabindex="0" onmouseover=@(() => Describe?.Invoke(Description)) onfocus=@(() => Describe?.Invoke(Description)) onblur=@(() => Describe?.Invoke(""))>
+    <label class="title">@Title</label>
+    <div class="row">
+        <label class="value">@Value.ToString($"F{Precision}", CultureInfo.CurrentCulture)@Unit</label>
+        <SliderControl Min=@((float)Min) Max=@((float)Max) Step=@((float)Step) Value=@((float)Value) ShowValueTooltip=@false OnValueChanged=@((float value) => Set(value)) />
+    </div>
+</root>
+
+@code {
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string Description { get; set; } = "";
+    [Parameter] public string Unit { get; set; } = "";
+    [Parameter] public double Min { get; set; }
+    [Parameter] public double Max { get; set; } = 100;
+    [Parameter] public double Step { get; set; } = 1;
+    [Parameter] public int Precision { get; set; }
+    [Parameter] public double Value { get; set; }
+    [Parameter] public Action<double>? Changed { get; set; }
+    [Parameter] public Action<string>? Describe { get; set; }
+
+    protected override int BuildHash() => HashCode.Combine(Title, Value);
+
+    public override void OnButtonTyped(ButtonEvent e)
+    {
+        if (e.Button is "left" or "right")
+        {
+            Set(Value + (e.Button == "left" ? -Step : Step));
+            return;
+        }
+
+        base.OnButtonTyped(e);
+    }
+
+    private void Set(double value)
+    {
+        if (Step > 0)
+        {
+            value = Math.Round(value / Step) * Step;
+        }
+
+        value = Math.Clamp(value, Min, Max);
+        if (value != Value)
+        {
+            Value = value;
+            Changed?.Invoke(value);
+        }
+    }
+}

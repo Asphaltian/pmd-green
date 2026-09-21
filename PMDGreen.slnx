@@ -1,0 +1,41 @@
+<Solution>
+  <Folder Name="/lib/" />
+  <Folder Name="/lib/GBAModernRuntime/" />
+  <Folder Name="/lib/GBAModernRuntime/GBARecomp/" />
+  <Folder Name="/lib/GBAModernRuntime/GBARecomp/src/">
+    <Project Path="lib/GBAModernRuntime/GBARecomp/src/GBARecomp/GBARecomp.csproj" />
+  </Folder>
+  <Folder Name="/lib/GBAModernRuntime/GBARecomp/tests/">
+    <Project Path="lib/GBAModernRuntime/GBARecomp/tests/GBARecomp.Tests/GBARecomp.Tests.csproj" />
+  </Folder>
+  <Folder Name="/lib/GBAModernRuntime/src/">
+    <Project Path="lib/GBAModernRuntime/src/AGBModern/AGBModern.csproj" />
+    <Project Path="lib/GBAModernRuntime/src/GBARenderer/GBARenderer.csproj" />
+    <Project Path="lib/GBAModernRuntime/src/LibRecomp/LibRecomp.csproj" />
+  </Folder>
+  <Folder Name="/lib/GBAModernRuntime/tests/">
+    <Project Path="lib/GBAModernRuntime/tests/AGBModern.Tests/AGBModern.Tests.csproj" />
+    <Project Path="lib/GBAModernRuntime/tests/GBARenderer.Tests/GBARenderer.Tests.csproj" />
+    <Project Path="lib/GBAModernRuntime/tests/LibRecomp.Tests/LibRecomp.Tests.csproj" />
+    <Project Path="lib/GBAModernRuntime/tests/Recompilation.Tests/Recompilation.Tests.csproj" />
+  </Folder>
+  <Folder Name="/lib/Socotra/" />
+  <Folder Name="/lib/Socotra/src/">
+    <Project Path="lib/Socotra/src/Microsoft.AspNetCore.Components/Microsoft.AspNetCore.Components.csproj" />
+    <Project Path="lib/Socotra/src/Socotra.Generator/Socotra.Generator.csproj" />
+    <Project Path="lib/Socotra/src/Socotra.Layout/Socotra.Layout.csproj" />
+    <Project Path="lib/Socotra/src/Socotra.Razor/Socotra.Razor.csproj" />
+    <Project Path="lib/Socotra/src/Socotra/Socotra.csproj" />
+    <Project Path="lib/Socotra/src/Socotra.Vulkan/Socotra.Vulkan.csproj" />
+    <Project Path="lib/Socotra/src/Topten.RichTextKit/Topten.RichTextKit.csproj" />
+  </Folder>
+  <Folder Name="/lib/Socotra/tests/">
+    <Project Path="lib/Socotra/tests/Socotra.Layout.Tests/Socotra.Layout.Tests.csproj" />
+    <Project Path="lib/Socotra/tests/Socotra.Tests/Socotra.Tests.csproj" />
+    <Project Path="lib/Socotra/tests/Socotra.Vulkan.Tests/Socotra.Vulkan.Tests.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/PMDGreen/PMDGreen.csproj" />
+  </Folder>
+  <Project Path="RecompiledFuncs/RecompiledFuncs.csproj" />
+</Solution>

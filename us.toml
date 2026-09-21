@@ -1,0 +1,32 @@
+[input]
+rom_file_path = "pmd_red.gba"
+symbols_file_path = "pmd_red.sym"
+output_func_path = "RecompiledFuncs"
+text_address = 0x080001DC
+text_size = 0xB6728
+arm_funcs = ["Init", "IntrMain", "sub_80001E8", "sub_8000228"]
+noreturn_funcs = ["FatalError", "FatalErrorHang", "Hang"]
+
+ram_funcs = [
+    "IntrMain",
+    "sub_80001E8",
+    "sub_8000228",
+    "SoundMainRAM",
+    "ReadFlash1",
+    "ReadFlash_Core",
+    "VerifyFlashSector_Core",
+]
+
+manual_funcs = [
+    { name = "Init", address = 0x080000C0, size = 0x34 },
+    { name = "IntrMain", address = 0x08000104, size = 0xD4 },
+
+    { name = "ScrollDownWindow", address = 0x03001B94, size = 0x14, rom_address = 0x08272760 },
+    { name = "ScrollDownWindowInternal", address = 0x03001BA8, size = 0xFC, rom_address = 0x08272774 },
+    { name = "ScrollUpWindow", address = 0x03001CA4, size = 0x14, rom_address = 0x08272870 },
+    { name = "ScrollUpWindowInternal", address = 0x03001CB8, size = 0x120, rom_address = 0x08272884 },
+    { name = "sub_82729A4", address = 0x03001DD8, size = 0x14, rom_address = 0x082729A4 },
+    { name = "sub_82729B8", address = 0x03001DEC, size = 0xC0, rom_address = 0x082729B8 },
+    { name = "sub_8272A78", address = 0x03001EAC, size = 0x14, rom_address = 0x08272A78 },
+    { name = "sub_8272A8C", address = 0x03001EC0, size = 0xAE, rom_address = 0x08272A8C },
+]

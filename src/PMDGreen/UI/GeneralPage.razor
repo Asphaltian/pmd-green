@@ -1,0 +1,25 @@
+@using Socotra
+@inherits SettingsPage
+
+<root class="form">
+    <div class="body">
+        <div class="options" onmouseout=@LeaveOptions>
+            <ConfigRange Title="Stick Dead Zone"
+                         Description="How far you need to tilt the stick before it counts."
+                         Unit="%" Min=@(1) Value=@Settings.StickDeadzone Changed=@((double deadzone) => Set(() => Settings.StickDeadzone = (int)deadzone)) Describe=@Describe />
+            <ConfigOption Title="Background Input"
+                          Description="Lets the game read your controller while its window isn't selected. This doesn't change how the keyboard works."
+                          Choices=@OnOff Selected=@(Settings.BackgroundInput ? 0 : 1)
+                          Chosen=@((int choice) => Set(() => Settings.BackgroundInput = choice == 0)) Describe=@Describe />
+        </div>
+        <div class="description">
+            <label>@Description</label>
+        </div>
+    </div>
+</root>
+
+@code {
+    private static readonly string[] OnOff = ["On", "Off"];
+
+    protected override int BuildHash() => HashCode.Combine(Description, Settings.StickDeadzone, Settings.BackgroundInput);
+}

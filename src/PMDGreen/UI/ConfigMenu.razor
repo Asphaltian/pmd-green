@@ -1,0 +1,181 @@
+@using LibRecomp
+@using Socotra
+@inherits Panel
+
+<root tabindex="-1">
+    <div class="modal" disabled=@(_prompt is not null)>
+        <div class="tabs">
+            @foreach (var (tab, label) in Tabs)
+            {
+                <button class="tab" Active=@(tab == Tab) onclick=@(() => _chosen = tab) autofocus=@(tab == Tab ? "" : null)>
+                    <label>@label</label>
+                    <div class="indicator"></div>
+                </button>
+            }
+            <div class="icons">
+                <button class="icon" onclick=@AskToQuit>
+                    <i>logout</i>
+                </button>
+                <button class="icon" onclick=@(() => Closed?.Invoke())>
+                    <i>close</i>
+                </button>
+            </div>
+        </div>
+        @switch (Tab)
+        {
+            case ConfigTab.General:
+                <GeneralPage Settings=@Settings Changed=@Changed />
+                break;
+            case ConfigTab.Controls:
+                <ControlsPage Settings=@Settings Changed=@Changed />
+                break;
+            case ConfigTab.Display:
+                <DisplayPage Settings=@Settings Changed=@Changed />
+                break;
+            case ConfigTab.Sound:
+                <SoundPage Settings=@Settings Changed=@Changed />
+                break;
+            case ConfigTab.Mods:
+                <ModsPage InstallFromFile=@(() => ChooseFiles?.Invoke(InstallMods)) />
+                break;
+        }
+    </div>
+    <div class="prompts">
+        <div class="prompt">
+            @if (Input.UsingController)
+            {
+                <Image class="glyph" Texture=@Input.GetMoveGlyph(InputGlyphSize.Medium) />
+            }
+            else
+            {
+                <div class="arrows">
+                    <Image class="key" Texture=@Input.Keyboard.GetGlyph("Up", InputGlyphSize.Medium) />
+                    <div class="row">
+                        <Image class="key" Texture=@Input.Keyboard.GetGlyph("Left", InputGlyphSize.Medium) />
+                        <Image class="key" Texture=@Input.Keyboard.GetGlyph("Down", InputGlyphSize.Medium) />
+                        <Image class="key" Texture=@Input.Keyboard.GetGlyph("Right", InputGlyphSize.Medium) />
+                    </div>
+                </div>
+                <Image class="glyph" Texture=@Input.Keyboard.GetGlyph("Tab", InputGlyphSize.Medium) />
+            }
+            <label>Move</label>
+        </div>
+        <div class="prompt">
+            @foreach (var glyph in Glyphs(MenuInput.Accept, "Return"))
+            {
+                <Image class="glyph" Texture=@glyph />
+            }
+            <label>OK</label>
+        </div>
+        <div class="prompt">
+            @foreach (var glyph in Glyphs(MenuInput.Toggle, "Escape"))
+            {
+                <Image class="glyph" Texture=@glyph />
+            }
+            <label>Back</label>
+        </div>
+    </div>
+    @if (_prompt is { } prompt)
+    {
+        <Prompt Request=@prompt Closed=@(() => ClosePrompt(prompt)) />
+    }
+</root>
+
+@code {
+    private static readonly (ConfigTab Tab, string Label)[] Tabs =
+        [(ConfigTab.General, "General"), (ConfigTab.Controls, "Controls"), (ConfigTab.Display, "Display"), (ConfigTab.Sound, "Sound"), (ConfigTab.Mods, "Mods")];
+
+    private ConfigTab? _chosen;
+    private PromptRequest? _prompt;
+    private Panel? _returnFocus;
+
+    [Parameter] public Settings Settings { get; set; } = null!;
+    [Parameter] public ConfigTab StartTab { get; set; }
+    [Parameter] public IReadOnlyList<string>? Dropped { get; set; }
+    [Parameter] public Action? Changed { get; set; }
+    [Parameter] public Action? Closed { get; set; }
+    [Parameter] public Action? Quit { get; set; }
+    [Parameter] public Action<Action<IReadOnlyList<string>>>? ChooseFiles { get; set; }
+
+    protected override int BuildHash() => HashCode.Combine(Tab, _prompt, Input.UsingController);
+
+    private ConfigTab Tab => _chosen ?? StartTab;
+
+    protected override void OnAfterTreeRender(bool firstTime)
+    {
+        if (firstTime && Dropped is { Count: > 0 } files)
+        {
+            InstallMods(files);
+        }
+    }
+
+    public override void Tick()
+    {
+        base.Tick();
+        if (_prompt is not null)
+        {
+            return;
+        }
+
+        if (_returnFocus?.HasFocus == true)
+        {
+            _returnFocus = null;
+        }
+
+        _returnFocus?.Focus();
+    }
+
+    protected override void OnEscape(PanelEvent e)
+    {
+        Closed?.Invoke();
+    }
+
+    private IEnumerable<Texture?> Glyphs(MenuInput input, string key) => Input.UsingController
+        ? Settings.ControllerMenu.GetValueOrDefault(input, []).Select(button => Input.Gamepad.GetGlyph(button, InputGlyphSize.Medium))
+        : [Input.Keyboard.GetGlyph(key, InputGlyphSize.Medium)];
+
+    private void Ask(PromptRequest request)
+    {
+        var previous = _prompt;
+        _returnFocus ??= FindRootPanel()?.Focused;
+        _prompt = request;
+        previous?.Canceled?.Invoke();
+    }
+
+    private void ClosePrompt(PromptRequest request)
+    {
+        if (_prompt == request)
+        {
+            _prompt = null;
+        }
+    }
+
+    private void AskToQuit() => Ask(new PromptRequest("Are you sure you want to quit?", "Any progress since your last save will be lost.")
+    {
+        ConfirmText = "Quit",
+        CancelText = "Cancel",
+        ConfirmStyle = PromptButton.Danger,
+        Confirmed = Quit,
+    });
+
+    protected override void OnDrop(PanelEvent e)
+    {
+        if (e is not DropEvent { Files.Count: > 0 } drop || Recomp.CurrentGame is not null)
+        {
+            return;
+        }
+
+        e.StopPropagation();
+        drop.Action = DropAction.Copy;
+        if (drop.IsDrop)
+        {
+            InstallMods(drop.Files);
+        }
+    }
+
+    private void InstallMods(IReadOnlyList<string> files)
+    {
+        _chosen = ConfigTab.Mods;
+        ModInstaller.Install(files, Ask);
+    }
+}

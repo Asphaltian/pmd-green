@@ -1,0 +1,47 @@
+@import "theme";
+
+ConfigRange {
+    flex-direction: column;
+    align-items: flex-start;
+    flex-shrink: 0;
+    width: 100%;
+    margin: 16px 0 24px;
+
+    .title {
+        @include title;
+        padding: 0 12px;
+    }
+
+    .row {
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        max-width: 420px;
+        margin-top: 8px;
+    }
+
+    .value {
+        @include choice;
+        flex-shrink: 0;
+        width: 72px;
+        margin: 0 8px 0 12px;
+    }
+
+    .slidercontrol {
+        > .inner > .track > .track-active {
+            background-color: $color-primary;
+        }
+
+        &:hover > .inner > .track > .thumb {
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.67), 0 0 0 4px rgba(111, 227, 154, 0.25);
+        }
+
+        &:active > .inner > .track > .thumb {
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.67), 0 0 0 6px rgba(111, 227, 154, 0.38);
+        }
+    }
+
+    &:focus-visible .slidercontrol > .inner > .track > .thumb {
+        animation: focus-pulse-background 0.75s infinite;
+    }
+}

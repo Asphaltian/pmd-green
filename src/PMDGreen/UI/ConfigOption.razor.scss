@@ -1,0 +1,41 @@
+@import "theme";
+
+ConfigOption {
+    flex-direction: column;
+    align-items: flex-start;
+    flex-shrink: 0;
+    margin: 16px 0 24px;
+
+    .title {
+        @include title;
+        padding: 0 12px;
+    }
+
+    .choices {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .choice {
+        @include choice;
+        margin: 4px 12px 0;
+        padding: 8px 0;
+        border-bottom: $border-width solid rgba(0, 0, 0, 0);
+        color: $color-text-inactive;
+        transition: color 0.15s $ease, border-color 0.15s $ease;
+
+        &:hover,
+        &:focus {
+            color: $color-text;
+        }
+
+        &:focus-visible {
+            animation: focus-pulse-border 0.75s infinite;
+        }
+
+        &.active {
+            border-color: $color-text;
+            color: $color-text;
+        }
+    }
+}

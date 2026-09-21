@@ -1,0 +1,57 @@
+@using Socotra
+@inherits Panel
+
+<root>
+    <div class="content">
+        <label class="title">@Request.Title</label>
+        <label class="message">@Request.Message</label>
+        @if (Request.ConfirmText is not null || Request.CancelText is not null)
+        {
+            <div class="controls">
+                @if (Request.ConfirmText is { } confirm)
+                {
+                    <button class="action @StyleClass(Request.ConfirmStyle)" onclick=@Confirm autofocus=@(Request.FocusConfirm ? "" : null)>@confirm</button>
+                }
+                @if (Request.CancelText is { } cancel)
+                {
+                    <button class="action @StyleClass(Request.CancelStyle)" onclick=@Cancel autofocus=@(Request.FocusConfirm ? null : "")>@cancel</button>
+                }
+            </div>
+        }
+    </div>
+</root>
+
+@code {
+    [Parameter] public PromptRequest Request { get; set; } = null!;
+    [Parameter] public Action? Closed { get; set; }
+
+    protected override int BuildHash() => Request.GetHashCode();
+
+    protected override void OnEscape(PanelEvent e)
+    {
+        e.StopPropagation();
+        if (Request.CancelText is not null)
+        {
+            Cancel();
+        }
+    }
+
+    private static string StyleClass(PromptButton style) => style switch
+    {
+        PromptButton.Danger => "danger",
+        PromptButton.Plain => "plain",
+        _ => "",
+    };
+
+    private void Confirm()
+    {
+        Closed?.Invoke();
+        Request.Confirmed?.Invoke();
+    }
+
+    private void Cancel()
+    {
+        Closed?.Invoke();
+        Request.Canceled?.Invoke();
+    }
+}

@@ -1,0 +1,29 @@
+@using Socotra
+@inherits Panel
+
+<root onmouseover=@(() => Describe?.Invoke(Description))>
+    <label class="title">@Title</label>
+    <div class="choices">
+        @for (int i = 0; i < Choices.Count; i++)
+        {
+            int choice = i;
+            <button class="choice" Active=@(choice == Selected)
+                    onclick=@(() => Chosen?.Invoke(choice))
+                    onfocus=@(() => Describe?.Invoke(Description))
+                    onblur=@(() => Describe?.Invoke(""))>
+                @Choices[choice]
+            </button>
+        }
+    </div>
+</root>
+
+@code {
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string Description { get; set; } = "";
+    [Parameter] public IReadOnlyList<string> Choices { get; set; } = [];
+    [Parameter] public int Selected { get; set; }
+    [Parameter] public Action<int>? Chosen { get; set; }
+    [Parameter] public Action<string>? Describe { get; set; }
+
+    protected override int BuildHash() => HashCode.Combine(Title, Choices.Count, Selected);
+}

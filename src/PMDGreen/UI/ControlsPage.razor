@@ -1,0 +1,200 @@
+@using AGBModern
+@using Socotra
+@inherits Panel
+
+<root class="form">
+    <div class="header">
+        <button class="device @(_keyboard ? "keyboard" : "")" onclick=@ToggleDevice>
+            <div class="floater"></div>
+            <div class="icons">
+                <i class="gamepad">sports_esports</i>
+                <i class="keys">keyboard</i>
+            </div>
+        </button>
+        <button class="action warning" onclick=@ResetToDefaults>Reset to Default</button>
+    </div>
+    <div class="split">
+        <div class="mappings" onmouseout=@LeaveMappings>
+            @foreach (var row in Rows)
+            {
+                var names = Names(row);
+                <div class="mapping @(_listening?.Row == row ? "listening" : "")" onmouseover=@(() => _focused = row.Button)>
+                    <label class="name">@row.Label</label>
+                    <div class="bindings">
+                        @for (int i = 0; i < SlotCount; i++)
+                        {
+                            int slot = i;
+                            string? name = slot < names.Length ? names[slot] : null;
+                            <button class="binding @(_listening == (row, slot) ? "listening" : "")" onclick=@(() => Listen(row, slot))
+                                    onfocus=@(() => _focused = row.Button) onblur=@(() => _focused = null)>
+                                @if (_listening == (row, slot))
+                                {
+                                    <label class="hint">@(_keyboard ? "Press a key" : "Press a button")</label>
+                                }
+                                else if (name is not null && Glyph(name) is { } glyph)
+                                {
+                                    <Image class="glyph" Texture=@glyph />
+                                }
+                                else if (name is not null)
+                                {
+                                    <label class="key">@name</label>
+                                }
+                            </button>
+                        }
+                    </div>
+                    @if (row.Menu is { } menu)
+                    {
+                        <button class="clear" onclick=@(() => ResetMenu(menu)) onfocus=@(() => _focused = null)>
+                            <i>restart_alt</i>
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="clear" onclick=@(() => Clear(row)) onfocus=@(() => _focused = row.Button) onblur=@(() => _focused = null)>
+                            <i>delete</i>
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+        <InputVisual Bindings=@(_keyboard ? Settings.Keyboard : Settings.Controller) Keyboard=@_keyboard Focused=@_focused Revision=@_revision />
+    </div>
+</root>
+
+@code {
+    private const int SlotCount = 2;
+
+    private static readonly Row[] GameRows =
+    [
+        new("Up", Buttons.Up, null), new("Down", Buttons.Down, null), new("Left", Buttons.Left, null), new("Right", Buttons.Right, null),
+        new("A", Buttons.A, null), new("B", Buttons.B, null), new("L", Buttons.L, null), new("R", Buttons.R, null),
+        new("START", Buttons.Start, null), new("SELECT", Buttons.Select, null),
+    ];
+
+    private static readonly Row[] MenuRows = [new("Toggle Menu", null, MenuInput.Toggle), new("Accept (Menu)", null, MenuInput.Accept)];
+
+    private bool _keyboard = !Input.UsingController;
+    private (Row Row, int Slot)? _listening;
+    private Buttons? _focused;
+    private int _revision;
+
+    [Parameter] public Settings Settings { get; set; } = null!;
+    [Parameter] public Action? Changed { get; set; }
+
+    private IEnumerable<Row> Rows => _keyboard ? GameRows : [.. GameRows, .. MenuRows];
+
+    protected override int BuildHash() => HashCode.Combine(_keyboard, _listening, _focused, _revision);
+
+    public override void OnDeleted()
+    {
+        if (_listening is not null)
+        {
+            Input.StopListening();
+        }
+
+        base.OnDeleted();
+    }
+
+    private string[] Names(Row row) => row switch
+    {
+        { Button: { } button } => (_keyboard ? Settings.Keyboard : Settings.Controller).GetValueOrDefault(button, []),
+        { Menu: { } menu } => Settings.ControllerMenu.GetValueOrDefault(menu, []),
+        _ => [],
+    };
+
+    private void SetNames(Row row, string[] names)
+    {
+        if (row.Button is { } button)
+        {
+            (_keyboard ? Settings.Keyboard : Settings.Controller)[button] = names;
+        }
+        else if (row.Menu is { } menu)
+        {
+            Settings.ControllerMenu[menu] = names;
+        }
+    }
+
+    private Texture? Glyph(string name) =>
+        _keyboard ? Input.Keyboard.GetGlyph(name, InputGlyphSize.Medium) : Input.Gamepad.GetGlyph(name, InputGlyphSize.Medium);
+
+    private void LeaveMappings(PanelEvent e)
+    {
+        if (e.This is { HasHovered: false })
+        {
+            _focused = null;
+        }
+    }
+
+    private void ToggleDevice()
+    {
+        StopListening();
+        _keyboard = !_keyboard;
+    }
+
+    private void Listen(Row row, int slot)
+    {
+        _listening = (row, slot);
+        Input.Listen(_keyboard, row.Menu is not null, name => Bind(row, slot, name));
+    }
+
+    private void StopListening()
+    {
+        if (_listening is not null)
+        {
+            _listening = null;
+            Input.StopListening();
+        }
+    }
+
+    private void Bind(Row row, int slot, string? name)
+    {
+        _listening = null;
+        var names = Names(row);
+        if (name is null || names.Contains(name))
+        {
+            return;
+        }
+
+        SetNames(row, slot < names.Length ? [.. names[..slot], name, .. names[(slot + 1)..]] : [.. names, name]);
+        Save();
+    }
+
+    private void Clear(Row row)
+    {
+        StopListening();
+        SetNames(row, []);
+        Save();
+    }
+
+    private void ResetMenu(MenuInput menu)
+    {
+        StopListening();
+        Settings.ControllerMenu[menu] = new Settings().ControllerMenu[menu];
+        Save();
+    }
+
+    private void ResetToDefaults()
+    {
+        StopListening();
+        var defaults = new Settings();
+        if (_keyboard)
+        {
+            Settings.Keyboard = defaults.Keyboard;
+        }
+        else
+        {
+            Settings.Controller = defaults.Controller;
+            Settings.ControllerMenu = defaults.ControllerMenu;
+        }
+
+        Save();
+    }
+
+    private void Save()
+    {
+        _revision++;
+        Changed?.Invoke();
+    }
+
+    private sealed record Row(string Label, Buttons? Button, MenuInput? Menu);
+}

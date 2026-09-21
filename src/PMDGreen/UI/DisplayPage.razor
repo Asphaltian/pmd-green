@@ -1,0 +1,37 @@
+@using Socotra
+@inherits SettingsPage
+
+<root class="form">
+    <div class="body">
+        <div class="options" onmouseout=@LeaveOptions>
+            <ConfigOption Title="Screen Mode"
+                          Description="Choose how the game fits on your screen. Full Screen gives the game the whole display. You can also switch with F11 or Alt+Enter."
+                          Choices=@ScreenModes Selected=@((int)Settings.WindowMode)
+                          Chosen=@((int choice) => Set(() => Settings.WindowMode = (WindowMode)choice)) Describe=@Describe />
+            <ConfigOption Title="Widescreen"
+                          Description="See more of the world on a wide screen, instead of black bars at the sides."
+                          Choices=@OnOff Selected=@(Settings.Widescreen ? 0 : 1)
+                          Chosen=@((int choice) => Set(() => Settings.Widescreen = choice == 0)) Describe=@Describe />
+            <ConfigOption Title="Pixel-Perfect Scaling"
+                          Description="Keeps every pixel the same size for a crisp picture. You may see a border around the edges."
+                          Choices=@OnOff Selected=@(Settings.IntegerScaling ? 0 : 1)
+                          Chosen=@((int choice) => Set(() => Settings.IntegerScaling = choice == 0)) Describe=@Describe />
+            <ConfigOption Title="Smooth Motion"
+                          Description="Makes movement look smoother on screens faster than 60 Hz. Auto turns it on when your screen can show it."
+                          Choices=@AutoOnOff Selected=@(Settings.InterpolateMotion switch { null => 0, true => 1, false => 2 })
+                          Chosen=@((int choice) => Set(() => Settings.InterpolateMotion = choice switch { 1 => true, 2 => false, _ => null })) Describe=@Describe />
+        </div>
+        <div class="description">
+            <label>@Description</label>
+        </div>
+    </div>
+</root>
+
+@code {
+    private static readonly string[] ScreenModes = ["Window", "Borderless", "Full Screen"];
+    private static readonly string[] OnOff = ["On", "Off"];
+    private static readonly string[] AutoOnOff = ["Auto", "On", "Off"];
+
+    protected override int BuildHash() =>
+        HashCode.Combine(Description, Settings.WindowMode, Settings.Widescreen, Settings.IntegerScaling, Settings.InterpolateMotion);
+}

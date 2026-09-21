@@ -1,0 +1,112 @@
+@using Socotra
+@inherits Panel
+
+<root>
+    <div class="art"></div>
+    <div class="shade"></div>
+    <div class="corner"></div>
+    <div class="glow"></div>
+    <div class="logo"></div>
+    <div class="menu" disabled=@(_settings is not null)>
+        @if (HasROM)
+        {
+            <button class="item" @ref="_first" onclick=@Start autofocus>
+                <div class="marker"></div>
+                <label>Play</label>
+            </button>
+        }
+        else
+        {
+            <button class="item" @ref="_first" onclick=@(() => SelectROM?.Invoke()) autofocus>
+                <div class="marker"></div>
+                <label>Choose a ROM</label>
+            </button>
+        }
+        <button class="item" @ref="_settingsButton" onclick=@(() => OpenSettings(ConfigTab.General, null))>
+            <div class="marker"></div>
+            <label>Settings</label>
+        </button>
+        <button class="item" onclick=@(() => Exit?.Invoke())>
+            <div class="marker"></div>
+            <label>Quit</label>
+        </button>
+        <label class="version">Version @Version</label>
+    </div>
+    @if (_settings is { } settings)
+    {
+        <ConfigMenu Settings=@Settings StartTab=@settings.Tab Dropped=@settings.Dropped Changed=@SettingsChanged Closed=@CloseSettings
+                    Quit=@Exit ChooseFiles=@ChooseFiles />
+    }
+</root>
+
+@code {
+    private SettingsRequest? _settings;
+    private Panel? _first;
+    private Panel? _settingsButton;
+    private Panel? _pendingFocus;
+
+    [Parameter] public bool HasROM { get; set; }
+    [Parameter] public string Version { get; set; } = "";
+    [Parameter] public Settings Settings { get; set; } = null!;
+    [Parameter] public Func<bool>? StartGame { get; set; }
+    [Parameter] public Action? SelectROM { get; set; }
+    [Parameter] public Action? SettingsChanged { get; set; }
+    [Parameter] public Action? Exit { get; set; }
+    [Parameter] public Action<Action<IReadOnlyList<string>>>? ChooseFiles { get; set; }
+
+    protected override int BuildHash() => HashCode.Combine(HasROM, Version, _settings);
+
+    protected override void OnAfterTreeRender(bool firstTime)
+    {
+        if (firstTime)
+        {
+            _pendingFocus = _first;
+        }
+    }
+
+    public override void Tick()
+    {
+        base.Tick();
+        if (_pendingFocus?.HasFocus == true)
+        {
+            _pendingFocus = null;
+        }
+
+        _pendingFocus?.Focus();
+    }
+
+    private void Start()
+    {
+        if (StartGame?.Invoke() == true)
+        {
+            Delete();
+        }
+    }
+
+    private void OpenSettings(ConfigTab tab, IReadOnlyList<string>? dropped)
+    {
+        _settings = new SettingsRequest(tab, dropped);
+    }
+
+    private void CloseSettings()
+    {
+        _settings = null;
+        _pendingFocus = _settingsButton;
+    }
+
+    protected override void OnDrop(PanelEvent e)
+    {
+        if (e is not DropEvent { Files.Count: > 0 } drop || _settings is not null)
+        {
+            return;
+        }
+
+        drop.Action = DropAction.Copy;
+        if (drop.IsDrop)
+        {
+            OpenSettings(ConfigTab.Mods, drop.Files);
+        }
+    }
+
+    private sealed record SettingsRequest(ConfigTab Tab, IReadOnlyList<string>? Dropped);
+}

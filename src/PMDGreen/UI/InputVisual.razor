@@ -1,0 +1,57 @@
+@using AGBModern
+@using Socotra
+@inherits Panel
+
+<root>
+    <div class="diagram">
+        <div class="outline"></div>
+        @foreach (var callout in Callouts)
+        {
+            <div class="callout @callout.Name @(callout.Rows.Any(row => row.Button == Focused) ? "focused" : "")">
+                <SvgPanel class="lines" Src=@($"assets/ui/callouts/{callout.Name}.svg") />
+                <div class="caption @(callout.Right ? "right" : "left")">
+                    @foreach (var row in callout.Rows)
+                    {
+                        <div class="row @(row.Button == Focused ? "focused" : "")">
+                            <div class="glyphs">
+                                @foreach (var glyph in Glyphs(row.Button))
+                                {
+                                    <Image class="glyph" Texture=@glyph />
+                                }
+                            </div>
+                            <label class="name">@row.Name</label>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</root>
+
+@code {
+    private static readonly Callout[] Callouts =
+    [
+        new("l", false, [new(Buttons.L, "L")]),
+        new("dpad", false, [new(Buttons.Up, "Up"), new(Buttons.Down, "Down"), new(Buttons.Left, "Left"), new(Buttons.Right, "Right")]),
+        new("start", false, [new(Buttons.Start, "START")]),
+        new("select", false, [new(Buttons.Select, "SELECT")]),
+        new("r", true, [new(Buttons.R, "R")]),
+        new("a", true, [new(Buttons.A, "A")]),
+        new("b", true, [new(Buttons.B, "B")]),
+    ];
+
+    [Parameter] public Dictionary<Buttons, string[]> Bindings { get; set; } = [];
+    [Parameter] public bool Keyboard { get; set; }
+    [Parameter] public Buttons? Focused { get; set; }
+    [Parameter] public int Revision { get; set; }
+
+    protected override int BuildHash() => HashCode.Combine(Keyboard, Focused, Revision);
+
+    private IReadOnlyList<Texture> Glyphs(Buttons button) => [.. Bindings.GetValueOrDefault(button, [])
+        .Select(name => Keyboard ? Input.Keyboard.GetGlyph(name, InputGlyphSize.Medium) : Input.Gamepad.GetGlyph(name, InputGlyphSize.Medium))
+        .OfType<Texture>()];
+
+    private sealed record Row(Buttons Button, string Name);
+
+    private sealed record Callout(string Name, bool Right, Row[] Rows);
+}

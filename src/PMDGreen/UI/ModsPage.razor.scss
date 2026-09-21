@@ -1,0 +1,285 @@
+@import "theme";
+
+ModsPage {
+    .heading {
+        @include heading;
+    }
+
+    .header .heading {
+        @include title;
+    }
+
+    .text-option {
+        flex-direction: column;
+        align-items: flex-start;
+        flex-shrink: 0;
+        margin: 16px 0 24px;
+
+        .title {
+            @include title;
+            padding: 0 12px;
+        }
+    }
+
+    .field {
+        width: 100%;
+        max-width: 640px;
+        margin: 8px 12px 0;
+        padding: 12px 16px;
+        border: $border-width solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        background-color: rgba(255, 255, 255, 0.05);
+
+        &:focus {
+            border-color: rgba(255, 255, 255, 0.8);
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+    }
+
+    .empty {
+        flex-grow: 1;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        color: $color-text-inactive;
+
+        .heading {
+            color: $color-text;
+        }
+    }
+
+    .browser {
+        position: relative;
+        flex-direction: row;
+        flex-grow: 1;
+        min-height: 0;
+    }
+
+    .list {
+        flex-direction: column;
+        flex-grow: 1;
+        flex-shrink: 1;
+        flex-basis: 0;
+        overflow-y: scroll;
+        background-color: $color-shadow;
+    }
+
+    .spacer {
+        flex-shrink: 0;
+        height: 0;
+        transition: height 0.15s $ease;
+
+        &.open {
+            height: 128px;
+        }
+    }
+
+    .entry {
+        flex-direction: row;
+        flex-shrink: 0;
+        width: 100%;
+        padding: 4px;
+        border-left: $border-width solid rgba(242, 242, 242, 0.05);
+        background-color: rgba(242, 242, 242, 0.05);
+        color: $color-text;
+
+        &:hover {
+            border-color: rgba(242, 242, 242, 0.25);
+        }
+
+        &:focus-visible {
+            border-color: $color-primary;
+        }
+
+        &.active {
+            border-color: rgba(242, 242, 242, 0.63);
+            background-color: rgba(20, 30, 25, 1);
+
+            &:hover {
+                border-color: $color-text;
+            }
+        }
+
+        &.off {
+            opacity: 0.5;
+        }
+
+        &.dragged {
+            display: none;
+        }
+
+        &.floating {
+            position: absolute;
+            border-color: $color-primary;
+            background-color: rgba(20, 30, 25, 1);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+        }
+
+        .text {
+            flex-direction: column;
+            margin-left: 16px;
+            padding: 8px 0;
+            max-height: 120px;
+            overflow: hidden;
+        }
+
+        .name {
+            @include title;
+        }
+
+        .summary {
+            margin-top: 4px;
+            color: $color-text-inactive;
+        }
+    }
+
+    .thumbnail {
+        flex-shrink: 0;
+        width: 120px;
+        height: 120px;
+        border-radius: 8px;
+        background-color: $color-overlay;
+
+        &.small {
+            width: 100px;
+            height: 100px;
+        }
+    }
+
+    .details {
+        flex-direction: column;
+        flex-grow: 1;
+        flex-shrink: 1;
+        flex-basis: 0;
+        background-color: $color-overlay;
+    }
+
+    .top,
+    .controls {
+        flex-direction: row;
+        flex-shrink: 0;
+        gap: 16px;
+        padding: 16px;
+        background-color: $color-shadow;
+    }
+
+    .top {
+        border-bottom: $border-width solid $color-border-soft;
+    }
+
+    .titles {
+        flex-direction: column;
+        justify-content: space-evenly;
+        flex-grow: 1;
+    }
+
+    .version {
+        color: $color-text-inactive;
+    }
+
+    .about {
+        flex-direction: column;
+        flex-grow: 1;
+        min-height: 0;
+        gap: 16px;
+        padding: 16px;
+        overflow-y: scroll;
+    }
+
+    .authors {
+        font-weight: 700;
+    }
+
+    .controls {
+        justify-content: space-between;
+        align-items: center;
+        border-top: $border-width solid $color-border-soft;
+    }
+
+    .enable {
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .note {
+        font-size: 18px;
+        color: $color-primary;
+    }
+
+    .toggle {
+        padding: 8px 16px 8px 8px;
+        border-radius: 12px;
+        transition: background-color 0.15s $ease;
+
+        &:hover,
+        &:focus {
+            background-color: $color-border-soft;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .switchcontrol {
+            pointer-events: none;
+
+            .switch-frame {
+                position: relative;
+                width: 80px;
+                height: 44px;
+                padding: 0;
+                border: 4px solid $color-border;
+                border-radius: $radius-round;
+                background-color: $color-border;
+                transition: background-color 0.15s $ease, border-color 0.15s $ease;
+
+                .switch-inner {
+                    position: absolute;
+                    left: 0%;
+                    top: 0;
+                    transform: translateX(0%);
+                    width: auto;
+                    height: 100%;
+                    aspect-ratio: 1;
+                    border-radius: $radius-round;
+                    background-color: $color-text-inactive;
+                    transition: left 0.15s $ease, transform 0.15s $ease, background-color 0.15s $ease;
+                }
+            }
+
+            .switch-label {
+                @include choice;
+                width: 34px;
+                white-space: nowrap;
+                margin-left: 16px;
+                color: $color-text-inactive;
+            }
+
+            &.active {
+                .switch-frame {
+                    border-color: $color-primary;
+                    background-color: $color-primary;
+                }
+
+                .switch-inner {
+                    left: 100%;
+                    margin-left: 0;
+                    transform: translateX(-100%);
+                    background-color: $color-text;
+                }
+
+                .switch-label {
+                    color: $color-text;
+                }
+            }
+        }
+    }
+
+    .footer .gap {
+        flex-grow: 1;
+    }
+}

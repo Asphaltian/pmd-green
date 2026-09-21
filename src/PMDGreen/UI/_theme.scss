@@ -1,0 +1,90 @@
+$color-background: #06100B;
+$color-modal: rgba(6, 16, 11, 0.9);
+$color-text: #EEF3EF;
+$color-text-dim: rgba(238, 243, 239, 0.45);
+$color-text-inactive: rgba(238, 243, 239, 0.6);
+$color-primary: #6FE39A;
+$color-primary-light: #B7F1CC;
+$color-warning: #E9CD35;
+$color-error: #F86039;
+$color-border: rgba(255, 255, 255, 0.2);
+$color-border-soft: rgba(255, 255, 255, 0.1);
+$color-border-hard: rgba(255, 255, 255, 0.3);
+$color-border-solid: rgba(255, 255, 255, 0.6);
+$color-overlay: rgba(184, 219, 196, 0.1);
+$color-shadow: rgba(0, 0, 0, 0.35);
+
+$border-width: 2px;
+$radius-round: 100px;
+
+$ease: ease-out;
+
+@mixin body {
+    font-family: Lato;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 32px;
+}
+
+@mixin heading {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 44px;
+}
+
+@mixin title {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 36px;
+}
+
+@mixin choice {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 28px;
+}
+
+@keyframes focus-pulse {
+    0% {
+        color: $color-primary;
+    }
+
+    50% {
+        color: $color-primary-light;
+    }
+
+    100% {
+        color: $color-primary;
+    }
+}
+
+@keyframes focus-pulse-border {
+    0% {
+        border-color: $color-primary;
+        color: $color-primary;
+    }
+
+    50% {
+        border-color: $color-primary-light;
+        color: $color-primary-light;
+    }
+
+    100% {
+        border-color: $color-primary;
+        color: $color-primary;
+    }
+}
+
+@keyframes focus-pulse-background {
+    0% {
+        background-color: $color-primary;
+    }
+
+    50% {
+        background-color: $color-primary-light;
+    }
+
+    100% {
+        background-color: $color-primary;
+    }
+}
