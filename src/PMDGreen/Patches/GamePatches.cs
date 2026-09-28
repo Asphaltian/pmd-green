@@ -8,6 +8,7 @@ internal static class GamePatches
         EntitySlots.Install();
         FileSystem.Install();
         GameFrame.Install();
+        RecompInput.Install();
         Tilemaps.Install();
         GroundMap.Install();
         GroundCamera.Install();

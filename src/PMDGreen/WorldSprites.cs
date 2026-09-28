@@ -8,9 +8,9 @@ using RecompiledFuncs;
 namespace PMDGreen;
 
 /// <summary>
-/// Sprites that belong to the world rather than the screen. They scroll smoothly with the camera,
-/// move smoothly when they move by themselves, and carry on into the widescreen margins. Draw yours
-/// from <see cref="Drawing"/>.
+/// <c>WorldSprites</c> is where you draw sprites that belong to the world rather than the screen,
+/// like a sign in town or an arrow over a monster. Sprites you draw here scroll smoothly with the
+/// camera, move smoothly when they move by themselves, and carry on into the widescreen margins.
 /// </summary>
 /// <example>
 /// <code>
@@ -28,9 +28,10 @@ namespace PMDGreen;
 public static class WorldSprites
 {
     /// <summary>
-    /// Runs every frame in towns and dungeons, right after the game draws the sprites of the world. You
-    /// also get the point of the world at the top left of the screen, in pixels, so draw each sprite at
-    /// its place in the world minus that. Whatever you do in here doesn't change the game's timing.
+    /// Runs every frame in towns and dungeons, right after the game draws its own sprites of the world.
+    /// You also get the point of the world at the top-left corner of the screen, in pixels, so draw each
+    /// sprite at its place in the world minus that. Whatever you do in here doesn't change the game's
+    /// timing.
     /// </summary>
     public static event Action<RecompContext, Vector2>? Drawing;
 
@@ -46,7 +47,7 @@ public static class WorldSprites
     /// Works out how something moved since the last frame, for <see cref="Draw"/>. Call it every frame
     /// you draw that thing, with a key that belongs to it alone, like the address of something of yours
     /// from <see cref="Memory.Allocate"/>. <paramref name="position"/> is where it is in the world in
-    /// pixels, fractions and all, and <paramref name="shown"/> is the whole pixel you draw it at.
+    /// pixels, fractions included, and <paramref name="shown"/> is the whole pixel you draw it at.
     /// </summary>
     public static Displacement Track(uint key, Vector2 position, Vector2 shown)
     {

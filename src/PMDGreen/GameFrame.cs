@@ -7,9 +7,9 @@ using RecompiledFuncs;
 namespace PMDGreen;
 
 /// <summary>
-/// The frame the game is drawing right now. This is where you add your own tiles to the widescreen
-/// margins, or turn the margins and smooth motion off while your mod shows something they don't
-/// suit.
+/// <c>GameFrame</c> is the frame the game is drawing right now. Usually you may need it to add your
+/// own tiles to the widescreen margins, or to turn the margins and smooth motion off while your mod
+/// shows something they don't suit.
 /// </summary>
 /// <example>
 /// <code>

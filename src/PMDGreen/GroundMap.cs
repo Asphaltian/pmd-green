@@ -7,7 +7,10 @@ using RecompiledFuncs;
 
 namespace PMDGreen;
 
-/// <summary>The map the game shows in towns, cutscenes and everywhere else outside of dungeons.</summary>
+/// <summary>
+/// <c>GroundMap</c> is the map the game shows in towns, cutscenes and everywhere else outside of
+/// dungeons. Usually you may need it if your mod adds something to one particular place.
+/// </summary>
 /// <example>
 /// <code>
 /// GroundMap.Selected += id =>
@@ -107,12 +110,12 @@ public static class GroundMap
     }
 
     /// <summary>
-    /// Runs when the game has selected a new map and loaded it, with the map's id. You get -1 if the
-    /// game cleared the map instead.
+    /// Runs when the game has selected a new map and loaded it, and gives you the map's id. You get
+    /// <c>-1</c> if the game cleared the map instead.
     /// </summary>
     public static event Action<int>? Selected;
 
-    /// <summary>The map the game shows right now, as its number in the decompilation's <c>GroundMapID</c>, or -1 if there's none.</summary>
+    /// <summary>The map the game shows right now, as its number in the decompilation's <c>GroundMapID</c>, or <c>-1</c> if there's none.</summary>
     public static int Id
     {
         get

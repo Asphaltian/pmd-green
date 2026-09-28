@@ -7,9 +7,9 @@ using RecompiledFuncs;
 namespace PMDGreen;
 
 /// <summary>
-/// The files in the game's archives, like <c>gGroundFileArchive</c>. You'll find each archive's
-/// address in <see cref="Data"/>, and the names of its files in the decompilation's tables, like
-/// <c>gGroundFiles</c>.
+/// <c>FileSystem</c> lets you swap the files in the game's archives for your own, like a map's
+/// palette. You'll find each archive's address in <see cref="Data"/>, like <c>gGroundFileArchive</c>,
+/// and the names of its files in the decompilation's tables, like <c>gGroundFiles</c>.
 /// </summary>
 /// <example>
 /// <code>

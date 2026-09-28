@@ -1,3 +1,4 @@
+using System.Numerics;
 using AGBModern;
 using SDL;
 using static SDL.SDL3;
@@ -7,7 +8,9 @@ namespace PMDGreen;
 internal static unsafe partial class Input
 {
     private const int StickRange = 32767;
+    private const float AxisScale = 1 / 32768f;
 
+    private static readonly Lock PendingInputLock = new();
     private static readonly Dictionary<SDL_Scancode, Buttons> Keys = [];
     private static readonly Dictionary<SDL_GamepadButton, Buttons> GamepadButtons = [];
     private static readonly Dictionary<SDL_GamepadButton, MenuInput> MenuButtons = [];
@@ -22,8 +25,23 @@ internal static unsafe partial class Input
     private static Buttons _keyboard;
     private static Buttons _gamepad;
     private static Buttons _stick;
+    private static Vector2 _pendingMouseDelta;
 
     public static bool UsingController { get; private set; }
+
+    public static Vector2 RightAnalog => new(
+        AxisState(SDL_GamepadAxis.SDL_GAMEPAD_AXIS_RIGHTX, 1) - AxisState(SDL_GamepadAxis.SDL_GAMEPAD_AXIS_RIGHTX, -1),
+        AxisState(SDL_GamepadAxis.SDL_GAMEPAD_AXIS_RIGHTY, 1) - AxisState(SDL_GamepadAxis.SDL_GAMEPAD_AXIS_RIGHTY, -1));
+
+    public static Vector2 TakeMouseDelta()
+    {
+        lock (PendingInputLock)
+        {
+            var delta = _pendingMouseDelta;
+            _pendingMouseDelta = Vector2.Zero;
+            return delta;
+        }
+    }
 
     public static void Configure(Settings settings, Action<string> showError)
     {
@@ -141,6 +159,14 @@ internal static unsafe partial class Input
                 HandleStick((SDL_GamepadAxis)e.gaxis.axis, e.gaxis.value);
                 break;
 
+            case SDL_EventType.SDL_EVENT_MOUSE_MOTION:
+                lock (PendingInputLock)
+                {
+                    _pendingMouseDelta += new Vector2(e.motion.xrel, e.motion.yrel);
+                }
+
+                break;
+
             case SDL_EventType.SDL_EVENT_GAMEPAD_ADDED:
                 SDL_OpenGamepad(e.gdevice.which);
                 break;
@@ -212,5 +238,26 @@ internal static unsafe partial class Input
         {
             _stick |= positive;
         }
+    }
+
+    private static float AxisState(SDL_GamepadAxis axis, int direction)
+    {
+        using var gamepads = SDL_GetGamepads();
+        if (gamepads is null)
+        {
+            return 0;
+        }
+
+        float state = 0;
+        for (int i = 0; i < gamepads.Count; i++)
+        {
+            var gamepad = SDL_GetGamepadFromID(gamepads[i]);
+            if (gamepad is not null)
+            {
+                state += Math.Clamp(direction * SDL_GetGamepadAxis(gamepad, axis) * AxisScale, 0, 1);
+            }
+        }
+
+        return Math.Clamp(state, 0, 1);
     }
 }

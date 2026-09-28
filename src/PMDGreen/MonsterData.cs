@@ -4,10 +4,10 @@ using PMDGreen.Patches;
 namespace PMDGreen;
 
 /// <summary>
-/// Your own data for each monster in a dungeon. A monster gets a new <typeparamref name="T"/> the
-/// first time you ask for its data, and keeps it until the floor ends. Keep in mind that this
-/// includes your team, so their data starts over on every floor too. Create one of these when your
-/// mod loads.
+/// <c>MonsterData</c> keeps your own data for each monster in a dungeon. A monster gets a new
+/// <typeparamref name="T"/> the first time you ask for its data, and keeps it until the floor ends.
+/// Keep in mind that this includes your team, so their data starts over on every floor too. Don't
+/// forget to create it when your mod loads.
 /// </summary>
 /// <example>
 /// <code>
@@ -27,7 +27,7 @@ public sealed class MonsterData<T>
 {
     private readonly Dictionary<ushort, T> _data = [];
 
-    /// <summary>Makes an empty set of data. Create it when your mod loads.</summary>
+    /// <summary>Makes an empty set of data.</summary>
     public MonsterData()
     {
         EntitySlots.Emptied += _data.Clear;
