@@ -18,6 +18,16 @@ public enum WindowMode
     Fullscreen,
 }
 
+/// <summary>How the picture fits a window that's wider than the GBA's screen.</summary>
+public enum AspectRatio
+{
+    /// <summary>Keeps the GBA screen's shape, with black bars at the sides.</summary>
+    Original,
+
+    /// <summary>Carries the picture on past the screen's edges to fill the window.</summary>
+    Expand,
+}
+
 /// <summary>A controller button the menus listen for.</summary>
 public enum MenuInput
 {
@@ -41,8 +51,8 @@ public sealed class Settings
     /// <summary>How the window fills the screen.</summary>
     public WindowMode WindowMode { get; set; }
 
-    /// <summary>Whether the picture carries on past the GBA screen's edges on a wide window.</summary>
-    public bool Widescreen { get; set; } = true;
+    /// <summary>How the picture fits a window that's wider than the GBA's screen.</summary>
+    public AspectRatio AspectRatio { get; set; } = AspectRatio.Expand;
 
     /// <summary>Whether the picture is only ever scaled by whole numbers.</summary>
     public bool IntegerScaling { get; set; }
@@ -101,10 +111,17 @@ public sealed class Settings
 
     private static string FilePath => Path.Combine(GamePaths.UserData, "settings.json");
 
-    /// <summary>Reads the saved settings, or gives the defaults if there are none or they can't be read.</summary>
+    /// <summary>Reads the saved settings. If there are none, or they can't be read, it saves the defaults and gives you those.</summary>
     public static Settings Load()
     {
-        return BackedUpFile.TryRead(FilePath, Parse, out var settings) ? settings : new Settings();
+        if (BackedUpFile.TryRead(FilePath, Parse, out var settings))
+        {
+            return settings;
+        }
+
+        settings = new Settings();
+        settings.Save();
+        return settings;
     }
 
     /// <summary>Saves the settings.</summary>

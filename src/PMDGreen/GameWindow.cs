@@ -261,7 +261,7 @@ internal sealed unsafe class GameWindow : IDisposable
         if (width > 0 && height > 0)
         {
             int widthAtGBAHeight = FrameRenderer.Height * width / height;
-            GameFrame.Margins.Width = _settings.Widescreen && GameFrame.ShowsMargins ? (widthAtGBAHeight - FrameRenderer.Width) / 2 : 0;
+            GameFrame.Margins.Width = _settings.AspectRatio == AspectRatio.Expand && GameFrame.ShowsMargins ? (widthAtGBAHeight - FrameRenderer.Width) / 2 : 0;
         }
 
         Renderer.Present(width, height);

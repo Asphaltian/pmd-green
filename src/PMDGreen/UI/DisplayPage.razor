@@ -8,10 +8,10 @@
                           Description="Choose how the game fits on your screen. Full Screen gives the game the whole display. You can also switch with F11 or Alt+Enter."
                           Choices=@ScreenModes Selected=@((int)Settings.WindowMode)
                           Chosen=@((int choice) => Set(() => Settings.WindowMode = (WindowMode)choice)) Describe=@Describe />
-            <ConfigOption Title="Widescreen"
-                          Description="See more of the world on a wide screen, instead of black bars at the sides."
-                          Choices=@OnOff Selected=@(Settings.Widescreen ? 0 : 1)
-                          Chosen=@((int choice) => Set(() => Settings.Widescreen = choice == 0)) Describe=@Describe />
+            <ConfigOption Title="Aspect Ratio"
+                          Description="Original keeps the GBA's screen shape, with black bars at the sides. Expand fills a wide screen and shows more of the world."
+                          Choices=@AspectRatios Selected=@((int)Settings.AspectRatio)
+                          Chosen=@((int choice) => Set(() => Settings.AspectRatio = (AspectRatio)choice)) Describe=@Describe />
             <ConfigOption Title="Pixel-Perfect Scaling"
                           Description="Keeps every pixel the same size for a crisp picture. You may see a border around the edges."
                           Choices=@OnOff Selected=@(Settings.IntegerScaling ? 0 : 1)
@@ -29,9 +29,10 @@
 
 @code {
     private static readonly string[] ScreenModes = ["Window", "Borderless", "Full Screen"];
+    private static readonly string[] AspectRatios = ["Original", "Expand"];
     private static readonly string[] OnOff = ["On", "Off"];
     private static readonly string[] AutoOnOff = ["Auto", "On", "Off"];
 
     protected override int BuildHash() =>
-        HashCode.Combine(Description, Settings.WindowMode, Settings.Widescreen, Settings.IntegerScaling, Settings.InterpolateMotion);
+        HashCode.Combine(Description, Settings.WindowMode, Settings.AspectRatio, Settings.IntegerScaling, Settings.InterpolateMotion);
 }
