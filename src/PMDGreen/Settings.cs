@@ -18,13 +18,13 @@ public enum WindowMode
     Fullscreen,
 }
 
-/// <summary>How the picture fits a window that's wider than the GBA's screen.</summary>
+/// <summary>How the picture fills a window that's wider than the GBA's screen.</summary>
 public enum AspectRatio
 {
-    /// <summary>Keeps the GBA screen's shape, with black bars at the sides.</summary>
+    /// <summary>Keeps the shape of the GBA's screen, with black bars at the sides.</summary>
     Original,
 
-    /// <summary>Carries the picture on past the screen's edges to fill the window.</summary>
+    /// <summary>Shows more of the world past the edges of the screen, so the picture fills the whole window.</summary>
     Expand,
 }
 

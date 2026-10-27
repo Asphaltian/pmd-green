@@ -144,18 +144,14 @@ internal static class GroundCamera
     private static void KeepWiderPictureOnTheMap(ref PixelPosition min, ref PixelPosition max)
     {
         int margin = GameFrame.Margins.Width * 256;
-        if (margin == 0)
+        if (margin == 0 || min.X >= max.X)
         {
             return;
         }
 
         int start = Math.Max(min.X, OriginX);
 
-        if (min.X >= max.X)
-        {
-            (min, max) = (min with { X = OriginX }, max with { X = OriginX + 1 });
-        }
-        else if (!GroundMap.IsAPlace)
+        if (!GroundMap.IsAPlace)
         {
             min = min with { X = Math.Min(start, max.X - 1) };
         }
