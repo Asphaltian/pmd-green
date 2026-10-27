@@ -39,7 +39,7 @@ cd pmd-green
 Put your ROM in the repository root as `pmd_red.gba`, then grab the symbols from [pret/pmd-red](https://github.com/pret/pmd-red):
 
 ```
-curl -L -o pmd_red.sym https://raw.githubusercontent.com/pret/pmd-red/66d44bd59/pmd_red.sym
+curl -L -o pmd_red.sym https://raw.githubusercontent.com/pret/pmd-red/ff61d9fcf/pmd_red.sym
 ```
 
 Now recompile the ROM, then build and run the game:
